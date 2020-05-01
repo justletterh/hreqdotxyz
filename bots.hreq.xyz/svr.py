@@ -3,6 +3,8 @@ import psutil
 import platform
 from datetime import datetime
 import sys
+import subprocess
+import asyncio
 def get_size(bytes, suffix="B"):
     """
     Scale bytes to its proper format
@@ -15,6 +17,114 @@ def get_size(bytes, suffix="B"):
         if bytes < factor:
             return f"{bytes:.2f}{unit}{suffix}"
         bytes /= factor
+async def ruby():
+    rb = subprocess.Popen(['ruby -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(rb.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def julia():
+    jl = subprocess.Popen(['julia -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(jl.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def php():
+    ph = subprocess.Popen(['php -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(ph.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def go():
+    gol = subprocess.Popen(['go version'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(gol.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def js():
+    jas = subprocess.Popen(['node -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(jas.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def lua():
+    lu = subprocess.Popen(['luvit -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(lu.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def rust():
+    rs = subprocess.Popen(['rustc --version'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(rs.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def crystal():
+    cr = subprocess.Popen(['crystal -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(cr.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def dotnet():
+    netv = subprocess.Popen(['dotnet --version'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    outv =   str(netv.stdout.read())
+    if outv.endswith("\n"):
+        outv = outv[0:len(outv)-1]
+    netr = subprocess.Popen(['dotnet --list-runtimes'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    outr =   str(netr.stdout.read())
+    if outr.endswith("\n"):
+        outr = outr[0:len(outr)-1]
+    nets = subprocess.Popen(['dotnet --list-sdks'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    outs =   str(nets.stdout.read())
+    if outs.endswith("\n"):
+        outs = outs[0:len(outs)-1]
+    return {'ver':f"{outv}", 'runtimes':f"{outr}", 'sdks':f"{outs}"}
+async def dart():
+    dr = subprocess.Popen(['dart --version'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(dr.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    if out == "":
+        out = 'Dart VM version: 2.7.2 (Unknown timestamp) on "linux_x64"'
+    return out
+async def elixir():
+    ex = subprocess.Popen(['elixir --version'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(ex.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def nginx():
+    ng = subprocess.Popen(['nginx -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(ng.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    if out == '':
+        out = 'nginx version: nginx/1.14.2'
+    return out
+async def docker():
+    dk = subprocess.Popen(['docker -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(dk.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def dockercompose():
+    dkc = subprocess.Popen(['docker-compose -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(dkc.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def apt():
+    ap = subprocess.Popen(['apt -v'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(ap.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
+async def nano():
+    na = subprocess.Popen(['nano --version'],stdout=subprocess.PIPE,universal_newlines=True,shell=True)
+    out =   str(na.stdout.read())
+    if out.endswith("\n"):
+        out = out[0:len(out)-1]
+    return out
 app = web.Application()
 routes = web.RouteTableDef()
 @routes.get('/')
@@ -65,7 +175,8 @@ async def status_handler(request):
         io = {'sent':bsent, 'rcved':brcved}
         inf = {'sys':system, 'cpu':cpu, 'mem':mem, 'net':net, 'io':io}
         py = {'ver':str(sys.version), 'verinf':str(sys.version_info)}
-        dat = {'sys':inf, 'py':py}
+        otherver = {'ruby':await ruby(), 'julia':await julia(), 'php':await php(), 'go':await go(), 'js':await js(), 'lua':await lua(), 'rust':await rust(), 'crystal':await crystal(), 'dotnet':await dotnet(), 'dart':await dart(), 'elixir':await elixir(), 'nginx':await nginx(), 'docker':await docker(), 'docker-compose':await dockercompose(), 'apt':await apt(), 'nano':await nano()}
+        dat = {'sys':inf, 'py':py, 'other-versions':otherver}
         return web.json_response(dat)
     if str(request.headers['auth']) != auth:
         raise web.HTTPUnauthorized()
