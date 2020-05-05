@@ -5,7 +5,7 @@ import asyncio
 import json
 async def main():
     async with aiohttp.ClientSession() as session:
-        async with session.get('http://142.93.69.231:8080/status', headers={'auth': '~&Ic7<^pg~QC&x|tdk5E@%dGqM&g<AMml6/^q.2.p?)f6agN1L9ZD{HIF,J:u?9S2E|,5BXf{X<'}) as resp:
+        async with session.get('http://142.93.69.231:8080/status', headers={'auth': 'TOKEN'}) as resp:
             global stats
             txt = await resp.text()
             stats = json.loads(txt)
