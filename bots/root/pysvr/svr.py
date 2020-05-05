@@ -5,6 +5,7 @@ from datetime import datetime
 import sys
 import subprocess
 import asyncio
+import aiohttp_cors
 def get_size(bytes, suffix="B"):
     """
     Scale bytes to its proper format
@@ -126,13 +127,17 @@ async def nano():
         out = out[0:len(out)-1]
     return out
 app = web.Application()
+cors = aiohttp_cors.setup(app, defaults={
+    "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+        )
+})
 routes = web.RouteTableDef()
-@routes.get('/')
-async def get_handler(request):
-    return web.Response(text="h")
 @routes.get('/status')
 async def status_handler(request):
-    auth = "PASSWORD_HERE"
+    auth = "PASSWORD"
     if str(request.headers['auth']) == auth:
         uname = platform.uname()
         os = f"{uname.system}"
@@ -177,8 +182,9 @@ async def status_handler(request):
         py = {'ver':str(sys.version), 'verinf':str(sys.version_info)}
         otherver = {'ruby':await ruby(), 'julia':await julia(), 'php':await php(), 'go':await go(), 'js':await js(), 'lua':await lua(), 'rust':await rust(), 'crystal':await crystal(), 'dotnet':await dotnet(), 'dart':await dart(), 'elixir':await elixir(), 'nginx':await nginx(), 'docker':await docker(), 'docker-compose':await dockercompose(), 'apt':await apt(), 'nano':await nano()}
         dat = {'sys':inf, 'py':py, 'other-versions':otherver}
-        return web.json_response(dat)
+        return web.json_response(data=dat, headers={"access-control-allow-origin": "*"})
     if str(request.headers['auth']) != auth:
         raise web.HTTPUnauthorized()
-app.add_routes(routes)
+resource = cors.add(app.router.add_resource("/status"))
+cors.add(resource.add_route("GET", status_handler))
 web.run_app(app)

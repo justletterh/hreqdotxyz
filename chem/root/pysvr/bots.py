@@ -3,9 +3,14 @@ import curses
 import aiohttp
 import asyncio
 import json
+print('loading...')
 async def main():
     async with aiohttp.ClientSession() as session:
+<<<<<<< HEAD:chem/root/pysvr/bots.py
+        async with session.get('http://142.93.69.231:8080/status', headers={'auth': 'PASSWORD'}) as resp:
+=======
         async with session.get('LINK', headers={'auth': 'TOKEN'}) as resp:
+>>>>>>> aa2372e3f435fbda26b7ab5436cb71bb28b74e68:tst/tst2.py
             global stats
             txt = await resp.text()
             stats = json.loads(txt)
