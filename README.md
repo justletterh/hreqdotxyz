@@ -7,6 +7,6 @@ this is a system metric checker using python and http requests
 
 ***
 
-# **the paths in [chem/root/pysvr/stat.sh](https://github.com/justletterh/hreqdotxyz/blob/master/chem/root/pysvr/stat.sh) are hard coded and you will most likely have to change them**
+## **the paths in [chem/root/pysvr/stat.sh](https://github.com/justletterh/hreqdotxyz/blob/master/chem/root/pysvr/stat.sh) are hard coded and you will most likely have to change them**
 
 ***
